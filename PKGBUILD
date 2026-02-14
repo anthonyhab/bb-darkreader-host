@@ -4,7 +4,7 @@
 pkgname=bb-darkreader-host
 pkgver=1.0.0
 pkgrel=1
-pkgdesc="Native messaging host for syncing pywal colors with Dark Reader (bb-auth fork)"
+pkgdesc="Native messaging host for syncing pywal colors with Dark Reader"
 arch=('x86_64')
 url="https://github.com/bb-auth/bb-darkreader-host"
 license=('MIT')
