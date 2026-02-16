@@ -1,0 +1,6 @@
+# Binaries
+bb-darkreader-host
+*.o
+
+# Build artifacts
+*.pkg.tar.*
