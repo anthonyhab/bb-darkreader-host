@@ -1,4 +1,4 @@
-# Maintainer: Anthony Habash <bb@hab.rip>
+# Maintainer: anthonyhab <bb@hab.rip>
 # Contributor: Based on seaglass by alexhulbert
 
 pkgname=bb-darkreader-host
