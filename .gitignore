@@ -1,5 +1,6 @@
 # Binaries
 bb-darkreader-host
+bb-darkreader-host-sanitize
 *.o
 
 # Build artifacts
