@@ -1,6 +1,6 @@
 pkgbase = bb-darkreader-host
 	pkgdesc = Native messaging host for syncing pywal colors with Dark Reader
-	pkgver = 0.2.0
+	pkgver = 0.2.1
 	pkgrel = 1
 	url = https://github.com/anthonyhab/bb-darkreader-host
 	arch = x86_64
@@ -9,7 +9,7 @@ pkgbase = bb-darkreader-host
 	depends = glibc
 	depends = json-c
 	options = !strip
-	source = bb-darkreader-host-0.2.0.tar.gz::https://github.com/anthonyhab/bb-darkreader-host/archive/refs/tags/v0.2.0.tar.gz
-	sha256sums = 529b0addb9bdb01023717fe29a86d48785b91db9f29daec51b27d081de052a30
+	source = bb-darkreader-host-0.2.1.tar.gz::https://github.com/anthonyhab/bb-darkreader-host/archive/refs/tags/v0.2.1.tar.gz
+	sha256sums = 72ca4fbb778b0620abe6fbb2642c5c1adb9b4aa26a12f0ec6bc4bb2eaad2589b
 
 pkgname = bb-darkreader-host

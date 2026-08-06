@@ -2,7 +2,7 @@
 # Contributor: Based on seaglass by alexhulbert
 
 pkgname=bb-darkreader-host
-pkgver=0.2.0
+pkgver=0.2.1
 pkgrel=1
 pkgdesc="Native messaging host for syncing pywal colors with Dark Reader"
 arch=('x86_64')
@@ -12,7 +12,7 @@ depends=('glibc' 'json-c')
 makedepends=('gcc')
 options=('!strip')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/anthonyhab/bb-darkreader-host/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('529b0addb9bdb01023717fe29a86d48785b91db9f29daec51b27d081de052a30')
+sha256sums=('72ca4fbb778b0620abe6fbb2642c5c1adb9b4aa26a12f0ec6bc4bb2eaad2589b')
 
 build() {
     cd "$pkgname-$pkgver"
