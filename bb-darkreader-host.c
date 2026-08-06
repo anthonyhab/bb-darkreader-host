@@ -293,9 +293,13 @@ static int handle_inotify(int fd, const char *filename, const char *colors_path)
             if (event->len && strcmp(event->name, filename) == 0) {
                 if (event->mask & IN_DELETE) {
                     should_reset = 1;
-                } else {
+                } else if (event->mask & (IN_CLOSE_WRITE | IN_MOVED_TO)) {
                     should_send = 1;
                 }
+                /* IN_CREATE alone is ignored: the file may still be mid-write,
+                 * and reading it now would emit a spurious error frame. The
+                 * complete file always lands an IN_CLOSE_WRITE (in-place
+                 * writes) or IN_MOVED_TO (atomic renames). */
             }
             offset += sizeof(*event) + event->len;
         }
