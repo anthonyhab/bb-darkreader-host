@@ -22,7 +22,7 @@
 #define COLORS_FILE_SIZE (64 * 1024)
 #define INOTIFY_BUFFER_SIZE (16 * 1024)
 #define RESPONSE_SIZE 512
-#define WATCH_RETRY_MS 250
+#define WATCH_RETRY_MS 50
 
 static char last_theme_response[RESPONSE_SIZE];
 static char last_error[128];
