@@ -3,12 +3,12 @@
 
 pkgname=bb-darkreader-host
 pkgver=0.1.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Native messaging host for syncing pywal colors with Dark Reader"
 arch=('x86_64')
 url="https://github.com/anthonyhab/bb-darkreader-host"
 license=('MIT')
-depends=('glibc')
+depends=('glibc' 'json-c')
 makedepends=('gcc')
 options=('!strip')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/anthonyhab/bb-darkreader-host/archive/refs/tags/v$pkgver.tar.gz")
@@ -16,7 +16,7 @@ sha256sums=('SKIP')
 
 build() {
     cd "$pkgname-$pkgver"
-    gcc -O2 -s -o bb-darkreader-host bb-darkreader-host.c
+    make
 }
 
 package() {

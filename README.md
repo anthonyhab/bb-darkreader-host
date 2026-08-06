@@ -2,13 +2,13 @@
 
 > Lightweight C native messaging host for Dark Reader
 
-A drop-in replacement for the seaglass Node.js host with **~1MB memory usage** instead of ~50MB.
+A drop-in replacement for the seaglass Node.js host with low memory usage and strict native-message/palette validation.
 
 ---
 
 ## Why?
 
-The original seaglass host uses Node.js and consumes significant memory. This C version uses **~1MB** with zero runtime dependencies.
+The original seaglass host uses Node.js and consumes significant memory. This C version avoids a JavaScript runtime and uses the small `json-c` parser for strict palette validation.
 
 Perfect if you run multiple color watchers (Dark Reader, Pywalfox, etc.) and want to minimize footprint.
 
@@ -19,6 +19,7 @@ Perfect if you run multiple color watchers (Dark Reader, Pywalfox, etc.) and wan
 - Linux with inotify support
 - Modified [Dark Reader fork](https://github.com/alexhulbert/SeaGlass/raw/main/user/files/darkreader.xpi) for Firefox
 - pywal or similar color generator
+- json-c
 
 ---
 
@@ -33,7 +34,7 @@ bb-darkreader-host install
 
 ### Manual Build
 ```bash
-gcc -O2 -s -o bb-darkreader-host bb-darkreader-host.c
+make
 sudo install -Dm755 bb-darkreader-host /usr/bin/bb-darkreader-host
 bb-darkreader-host install
 ```
@@ -54,8 +55,8 @@ bb-darkreader-host install
 ## How It Works
 
 1. **Firefox starts the daemon** via native messaging when Dark Reader loads
-2. **inotify watches** `~/.cache/wal/colors` for file changes
-3. **Automatic updates** sent to Dark Reader when colors change
+2. **inotify watches** the directory containing `~/.cache/wal/colors.json`, including atomic renames
+3. **Validated, deduplicated updates** are sent to Dark Reader when effective colors change
 
 The daemon automatically detects changes to the pywal colors file and sends updates to Dark Reader. No manual configuration needed after installation.
 
@@ -63,7 +64,7 @@ The daemon automatically detects changes to the pywal colors file and sends upda
 
 ## Integration with Theme Hooks
 
-The daemon automatically updates when `~/.cache/wal/colors` changes. No manual updates needed - just ensure your theme hooks generate the pywal colors file.
+The daemon automatically updates when `~/.cache/wal/colors.json` changes. No manual update command is needed.
 
 ---
 
@@ -73,7 +74,7 @@ The daemon automatically updates when `~/.cache/wal/colors` changes. No manual u
 |--------|-------|
 | Binary size | ~15KB |
 | Memory usage | ~1MB |
-| Dependencies | None (glibc only) |
+| Dependencies | glibc, json-c |
 | Build tools | gcc |
 
 ---
@@ -99,7 +100,7 @@ bb-darkreader-host install
 ### Verify colors file
 ```bash
 # Check pywal colors exist
-cat ~/.cache/wal/colors | head -20
+python3 -m json.tool ~/.cache/wal/colors.json | head -20
 ```
 
 ---
@@ -110,7 +111,7 @@ cat ~/.cache/wal/colors | head -20
 # Clone and build
 git clone https://github.com/anthonyhab/bb-darkreader-host-c.git
 cd bb-darkreader-host-c
-gcc -O2 -s -o bb-darkreader-host bb-darkreader-host.c
+make
 
 # Install
 sudo install -Dm755 bb-darkreader-host /usr/bin/bb-darkreader-host
