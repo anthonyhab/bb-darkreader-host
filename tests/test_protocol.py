@@ -2,6 +2,7 @@
 import json
 import os
 import select
+import shutil
 import struct
 import subprocess
 import tempfile
@@ -257,6 +258,31 @@ def test_fallback_palettes(colors_path: Path, environment: dict) -> None:
             stop_process(process)
 
 
+def test_request_json(colors_path: Path, environment: dict) -> None:
+    write_colors(colors_path)
+    cases = (
+        ('{"data":{"type":"reset"},"type":"init"}', "setTheme"),
+        ('{"note":"type","type":"init"}', "setTheme"),
+        ('{"ty\\u0070e":"init"}', "setTheme"),
+        ('{"type":"in\\u0069t"}', "setTheme"),
+        ('{"data":{"type":"init"}}', "error"),
+        ('{"type":"init"} trailing', "error"),
+        ('{"type":"init"', "error"),
+        ('{"type":"init\\u0000reset"}', "error"),
+    )
+    for payload, expected in cases:
+        process = start_process(environment)
+        try:
+            raw = payload.encode()
+            process.stdin.write(struct.pack("=I", len(raw)) + raw)
+            process.stdin.flush()
+            response = receive(process)
+            assert response["type"] == expected, (payload, response)
+            assert_no_message(process)
+        finally:
+            stop_process(process)
+
+
 def main() -> None:
     with tempfile.TemporaryDirectory(prefix="darkreader-host-test-") as directory:
         root = Path(directory)
@@ -276,6 +302,27 @@ def main() -> None:
         assert manifest["allowed_extensions"] == [
             "coloreader@bb.hab.rip",
             "darkreader@alexhulbert.com",
+        ]
+
+        # Manifest installation must not follow the old predictable temp name.
+        manifest_dir = install_home / ".mozilla/native-messaging-hosts"
+        victim = root / "must-not-overwrite"
+        victim.write_text("keep me", encoding="utf-8")
+        (manifest_dir / "darkreader.json.tmp").symlink_to(victim)
+        subprocess.run([HOST, "install"], env=install_environment, check=True, capture_output=True)
+        assert victim.read_text() == "keep me", "install followed a temp-file symlink"
+
+        # A legal Linux executable path can contain JSON metacharacters.
+        unusual_host = root / 'host-"quote\\backslash\tcontrol'
+        shutil.copy2(HOST, unusual_host)
+        subprocess.run([str(unusual_host), "install"], env=install_environment,
+                       check=True, capture_output=True)
+        manifest = json.loads((manifest_dir / "darkreader.json").read_text())
+        assert manifest["path"] == str(unusual_host)
+
+        # Independent installs must leave no private temporary files behind.
+        assert sorted(p.name for p in manifest_dir.iterdir()) == [
+            "darkreader.json", "darkreader.json.tmp",
         ]
 
         process = subprocess.Popen(
@@ -347,6 +394,7 @@ def main() -> None:
         test_oversized_frame_exits(environment)
         test_truncated_frames_exit_cleanly(environment)
         test_stdin_eof_exits_cleanly(environment)
+        test_request_json(colors_path, environment)
         test_invalid_palettes_rejected(colors_path, environment)
         test_fallback_palettes(colors_path, environment)
         test_self_healing_watch(root, environment)
@@ -354,3 +402,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
